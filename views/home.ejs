@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>
+        All Listings
+    </h1>
+    <form action="/new" method="GET"><button>Create a new Listing</button></form>
+
+    <%for(listing of listings){%>
+        <ul>
+            <li><%=listing.title%></li>
+             <li><%=listing.description%></li>
+              <li><img src="<%=listing.image%>" alt="listing image"></li>
+               <!-- <li><%=listing.price%></li>
+                <li><%=listing.location%></li>
+                 <li><%=listing.country%></li> -->
+                 <form action="/home/<%=listing._id%>" method="GET"><button>See details</button></form>
+        </ul>
+    <%}%>
+</body>
+</html>
