@@ -1,0 +1,109 @@
+/* Custom styles for animations and enhancements */
+
+/* Red and Black Theme */
+body {
+    background-color: #000000 !important; /* Black background */
+    color: #ffffff; /* White text */
+}
+
+.card {
+    background-color: #1a1a1a; /* Dark gray card background */
+    border: 1px solid #333; /* Dark border */
+    color: #ffffff;
+}
+
+.card-header {
+    background-color: #dc3545 !important; /* Red header */
+    border-bottom: 1px solid #333;
+}
+
+.btn-primary {
+    background-color: #dc3545; /* Red button */
+    border-color: #dc3545;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #c82333; /* Darker red on hover */
+    border-color: #bd2130;
+    color: #ffffff;
+}
+
+.btn-secondary {
+    background-color: #333; /* Dark gray secondary button */
+    border-color: #333;
+    color: #ffffff;
+}
+
+.btn-secondary:hover {
+    background-color: #555; /* Lighter gray on hover */
+    border-color: #555;
+    color: #ffffff;
+}
+
+.btn-outline-primary {
+    color: #dc3545; /* Red text */
+    border-color: #dc3545; /* Red border */
+    background-color: transparent;
+}
+
+.btn-outline-primary:hover {
+    background-color: #dc3545; /* Red background on hover */
+    border-color: #dc3545;
+    color: #ffffff; /* White text on hover */
+}
+
+.form-control {
+    background-color: #2a2a2a; /* Dark input background */
+    border: 1px solid #555;
+    color: #ffffff;
+}
+
+.form-control:focus {
+    background-color: #2a2a2a;
+    border-color: #dc3545; /* Red focus border */
+    color: #ffffff;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-label {
+    color: #ffffff;
+}
+
+/* Button animations */
+.btn-animated {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-animated:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.btn-animated:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Form enhancements */
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .d-md-flex {
+        flex-direction: column;
+    }
+
+    .btn-animated {
+        margin-bottom: 10px;
+    }
+}
