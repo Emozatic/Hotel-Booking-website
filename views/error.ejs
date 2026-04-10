@@ -1,0 +1,15 @@
+<%-layout("/layouts/boilerplate")%>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 col-12">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h1 class="h3 mb-0">Error: <%= err.status %></h1>
+                </div>
+                <div class="card-body">
+                    <p class="card-text"><%= err.message %></p>
+                    <a href="/home" class="btn btn-primary btn-animated">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>

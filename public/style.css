@@ -97,6 +97,13 @@ body {
     border-radius: 10px 10px 0 0 !important;
 }
 
+/* Sticky footer styling */
+.sticky-footer {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: 0;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .d-md-flex {
