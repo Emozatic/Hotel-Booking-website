@@ -8,8 +8,10 @@ const methodOverride= require("method-override");
 const ejsMate= require("ejs-mate");
 const ExpressError= require("./utils/ExpressError");
 const wrapAsync= require("./utils/wrapAsync");
+const { listingSchema } = require("./schema");
 const validateId= require("./utils/validation").validateId
-const validateListing= require("./utils/validation").validateListing;
+//const validateListing= require("./utils/validation").validateListing;
+const {listingSchemaData}=require("./schema");
 main()
 .then((res)=>{
     console.log("connected to database");
@@ -29,20 +31,26 @@ app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname,"/public")));
 
 
-
+//middleware for validating listing data using Joi
+const validateListing= (req,res,next)=>{    
+    const { error } = listingSchemaData.validate(req.body);
+    if (error) {
+        throw new ExpressError(error.message, 400);
+    }
+    next();
+};
 
 //index route
-app.get("/home",wrapAsync(async(req,res)=>{
+app.get("/home",validateListing,wrapAsync(async(req,res)=>{
     const listings= await Listing.find({});
     console.log(listings);
     res.render("home.ejs",{listings});
 }))
 
 //show route
-app.get("/home/:id",validateId,wrapAsync(async(req,res)=>{
+app.get("/home/:id",validateId,validateListing,wrapAsync(async(req,res)=>{
     let {id}= req.params;
     let listing= await Listing.findById(id);
-    validateListing(listing);
     console.log(listing);
     res.render("show.ejs",{listing});
 }))
@@ -52,7 +60,7 @@ app.get("/new",(req,res)=>{
     res.render("new.ejs");
 })
 
-app.post("/home",wrapAsync(async(req,res)=>{
+app.post("/home",validateListing,wrapAsync(async(req,res)=>{
     const newListing= new Listing(req.body.listing);
     console.log(req.body.listing);
     await newListing.save().then((result)=>{console.log(result)}).catch((err)=>{console.log(err)}); 
@@ -61,18 +69,16 @@ app.post("/home",wrapAsync(async(req,res)=>{
 
 
 //edit route
-app.get("/edit/:id",validateId,wrapAsync(async(req,res)=>{
+app.get("/edit/:id",validateId,validateListing,wrapAsync(async(req,res)=>{
     let{id}= req.params;
     let listing= await Listing.findById(id);
-    validateListing(listing);
     res.render("edit.ejs",{id,listing});
 }));
 
 //post edit route
-app.put("/edit/:id",validateId,wrapAsync(async(req,res)=>{   
+app.put("/edit/:id",validateId,validateListing,wrapAsync(async(req,res)=>{   
     let {id}= req.params;
     let listing= await Listing.findByIdAndUpdate(id,{...req.body.listing});
-    validateListing(listing);
     res.redirect("/home");
 }))
 
