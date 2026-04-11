@@ -8,10 +8,10 @@ const methodOverride= require("method-override");
 const ejsMate= require("ejs-mate");
 const ExpressError= require("./utils/ExpressError");
 const wrapAsync= require("./utils/wrapAsync");
-const { listingSchema } = require("./schema");
 const validateId= require("./utils/validation").validateId
 //const validateListing= require("./utils/validation").validateListing;
-const {listingSchemaData}=require("./schema");
+const {listingSchemaData,reviewSchema}=require("./schema");
+const Review= require("./models/reviews");
 main()
 .then((res)=>{
     console.log("connected to database");
@@ -40,6 +40,15 @@ const validateListing= (req,res,next)=>{
     next();
 };
 
+//middleware for validation of comment using joi
+const validateReview= (req,res,next)=>{
+    const{error}= reviewSchema.validate(req.body);
+    if(error){
+        throw new ExpressError(error.message, 400);
+    }
+    next();
+}
+
 //index route
 app.get("/home",validateListing,wrapAsync(async(req,res)=>{
     const listings= await Listing.find({});
@@ -50,7 +59,7 @@ app.get("/home",validateListing,wrapAsync(async(req,res)=>{
 //show route
 app.get("/home/:id",validateId,validateListing,wrapAsync(async(req,res)=>{
     let {id}= req.params;
-    let listing= await Listing.findById(id);
+    let listing= await Listing.findById(id).populate("reviews");
     console.log(listing);
     res.render("show.ejs",{listing});
 }))
@@ -89,6 +98,19 @@ app.delete("/delete/:id",validateId,wrapAsync(async(req,res)=>{
     res.redirect("/home");
 }));
 
+//review route
+app.post("/home/:id/reviews",validateReview,wrapAsync(async(req,res)=>{
+    let {id}=req.params;
+    let listing= await Listing.findById(id);
+    let newReview= new Review(req.body.review);
+    console.log(newReview);
+    listing.reviews.push(newReview);
+    await newReview.save();
+    await listing.save();
+    
+    res.redirect(`/home/${id}`);
+}))
+
 //cusotm error handler
 app.use((req,res,next)=>{
     next(new ExpressError("Page Not Found",404));
@@ -102,6 +124,7 @@ app.use((err,req,res,next)=>{
     let{status=500,message="An error occurred"}= err;
     console.log(`Status: ${status}, Message: ${message}`);
     res.render("error.ejs",{err});
+
 })
 
 app.listen(8000,()=>{
