@@ -8,13 +8,16 @@ const methodOverride= require("method-override");
 const ejsMate= require("ejs-mate");
 const ExpressError= require("./utils/ExpressError");
 const wrapAsync= require("./utils/wrapAsync");
-const validateId= require("./utils/validation").validateId
+//const validateId= require("./utils/validation").validateId
 //const validateListing= require("./utils/validation").validateListing;
 const {listingSchemaData,reviewSchema}=require("./schema");
 const Review= require("./models/reviews");
 const cookieParser= require("cookie-parser");
 const session= require("express-session");
 const flash= require("connect-flash");
+const LocalStretegy= require("passport-local");
+const passport= require("passport");
+const User= require("./models/user");
 main()
 .then((res)=>{
     console.log("connected to database");
@@ -47,6 +50,13 @@ app.use(cookieParser("secretCode"));
 app.use(session(sessionOption));
 app.use(flash());
 
+//passport options
+app.use(passport.initialize()); //initialize passport
+app.use(passport.session()); //help to check user if the page changed
+passport.use(new LocalStretegy(User.authenticate())); 
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 //middleware for flash
 app.use((req,res,next)=>{
     res.locals.successMsg= req.flash("success");
@@ -73,6 +83,7 @@ const validateReview= (req,res,next)=>{
     next();
 }
 
+
 //index route
 app.get("/home",validateListing,wrapAsync(async(req,res)=>{
     const listings= await Listing.find({});
@@ -81,7 +92,7 @@ app.get("/home",validateListing,wrapAsync(async(req,res)=>{
 }))
 
 //show route
-app.get("/home/:id",validateId,validateListing,wrapAsync(async(req,res)=>{
+app.get("/home/:id",validateListing,wrapAsync(async(req,res)=>{
     let {id}= req.params;
     let listing= await Listing.findById(id).populate("reviews");
     console.log(listing);
@@ -103,21 +114,21 @@ app.post("/home",validateListing,wrapAsync(async(req,res)=>{
 
 
 //edit route
-app.get("/edit/:id",validateId,validateListing,wrapAsync(async(req,res)=>{
+app.get("/edit/:id",validateListing,wrapAsync(async(req,res)=>{
     let{id}= req.params;
     let listing= await Listing.findById(id);
     res.render("edit.ejs",{id,listing});
 }));
 
 //post edit route
-app.put("/edit/:id",validateId,validateListing,wrapAsync(async(req,res)=>{   
+app.put("/edit/:id",validateListing,wrapAsync(async(req,res)=>{   
     let {id}= req.params;
     let listing= await Listing.findByIdAndUpdate(id,{...req.body.listing});
     res.redirect("/home");
 }))
 
 //delete route
-app.delete("/delete/:id",validateId,wrapAsync(async(req,res)=>{
+app.delete("/delete/:id",wrapAsync(async(req,res)=>{
     let {id}= req.params;
     await Listing.findByIdAndDelete(id);
     res.redirect("/home");
@@ -138,12 +149,35 @@ app.post("/home/:id/reviews",validateReview,wrapAsync(async(req,res)=>{
 
 
 //Delete review route
-app.delete("/home/:id/reviews/:reviewId",validateId,wrapAsync(async(req,res)=>{
+app.delete("/home/:id/reviews/:reviewId",wrapAsync(async(req,res)=>{
     let {id, reviewId}= req.params; ///home/:listingId/reviews/:reviewId
     await Listing.findByIdAndUpdate(id,{$pull: {reviews: reviewId}});
     await Review.findByIdAndDelete(reviewId);
     res.redirect(`/home/${id}`);
 }));
+
+
+//signup route
+app.get("/signup",(req,res)=>{
+    res.render("signup.ejs");
+})
+
+app.post("/signup",wrapAsync(async(req,res)=>{
+    try{
+        const {email,username}= req.body;
+    const newUser= new User({email,username});
+    const registeredUser= await User.register(newUser, req.body.password);
+    console.log(registeredUser);
+    req.flash("success","Welcome to Booking App");
+    res.redirect("/home");
+    }catch(err){
+        req.flash("error",err.message);
+        res.redirect("/signup");
+    }
+}))
+
+//
+
 
 //cusotm error handler
 app.use((req,res,next)=>{
@@ -160,6 +194,9 @@ app.use((err,req,res,next)=>{
     res.render("error.ejs",{err});
 
 })
+
+
+
 
 app.listen(8000,()=>{
     console.log("server is running on port 8000");
