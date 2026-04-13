@@ -47,6 +47,13 @@ app.use(cookieParser("secretCode"));
 app.use(session(sessionOption));
 app.use(flash());
 
+//middleware for flash
+app.use((req,res,next)=>{
+    res.locals.successMsg= req.flash("success");
+    res.locals.errorMsg= req.flash("error");
+    next();
+})
+
 
 //middleware for validating listing data using Joi
 const validateListing= (req,res,next)=>{    
@@ -91,6 +98,7 @@ app.post("/home",validateListing,wrapAsync(async(req,res)=>{
     console.log(req.body.listing);
     await newListing.save().then((result)=>{console.log(result)}).catch((err)=>{console.log(err)}); 
     res.redirect("/home");
+    req.flash("success","new Listing added");
 }))
 
 
