@@ -12,6 +12,9 @@ const validateId= require("./utils/validation").validateId
 //const validateListing= require("./utils/validation").validateListing;
 const {listingSchemaData,reviewSchema}=require("./schema");
 const Review= require("./models/reviews");
+const cookieParser= require("cookie-parser");
+const session= require("express-session");
+const flash= require("connect-flash");
 main()
 .then((res)=>{
     console.log("connected to database");
@@ -23,12 +26,26 @@ async function main(){
 }
 
 
+//session option
+const sessionOption={
+    secret:"supersecret",
+    resave:false,
+    saveunitialized:true,
+     cookie:{
+        expires:Date.now()+7*24*60*60*1000,
+        httpOnly:true,
+     }
+}
+
 app.set("view engine", "ejs");
 app.set("views",path.join(__dirname,"/views"));
 app.use(express.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname,"/public")));
+app.use(cookieParser("secretCode"));
+app.use(session(sessionOption));
+app.use(flash());
 
 
 //middleware for validating listing data using Joi
