@@ -87,6 +87,87 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
+/* Navbar styling */
+.custom-navbar {
+    background: rgba(8, 8, 10, 0.95);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+}
+
+.custom-navbar .navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.custom-navbar .brand-icon {
+    display: inline-flex;
+    width: 2.4rem;
+    height: 2.4rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.85rem;
+    background: rgba(220, 53, 69, 0.15);
+    color: #dc3545;
+    transition: transform 0.25s ease, background-color 0.25s ease;
+}
+
+.custom-navbar .brand-icon:hover {
+    transform: scale(1.05) rotate(-4deg);
+    background: rgba(220, 53, 69, 0.28);
+}
+
+.custom-navbar .nav-link {
+    color: #f4f4f4;
+    position: relative;
+    transition: color 0.25s ease;
+}
+
+.custom-navbar .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0;
+    height: 2px;
+    background: #dc3545;
+    transition: width 0.25s ease;
+}
+
+.custom-navbar .nav-link:hover,
+.custom-navbar .nav-link.active {
+    color: #ffffff;
+}
+
+.custom-navbar .nav-link:hover::after,
+.custom-navbar .nav-link.active::after {
+    width: 100%;
+}
+
+.auth-links .btn {
+    min-width: 110px;
+}
+
+.custom-navbar .navbar-toggler {
+    border-color: rgba(255,255,255,0.18);
+}
+
+.custom-navbar .navbar-toggler-icon {
+    filter: invert(1);
+}
+
+@media (max-width: 767px) {
+    .custom-navbar {
+        padding-top: 0.3rem;
+        padding-bottom: 0.3rem;
+    }
+
+    .custom-navbar .nav-link {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
 /* Form enhancements */
 .card {
     border: none;
@@ -324,4 +405,93 @@ body {
     .btn-animated {
         margin-bottom: 10px;
     }
+}
+
+/* Auth page theme and animations */
+body {
+    background: radial-gradient(circle at top left, rgba(220,53,69,0.22), transparent 24%),
+                radial-gradient(circle at bottom right, rgba(255,255,255,0.08), transparent 18%),
+                linear-gradient(180deg, #070707 0%, #111 100%);
+    min-height: 100vh;
+}
+
+.auth-wrapper {
+    min-height: 100vh;
+    padding: 2rem 1rem;
+}
+
+.auth-card {
+    background: rgba(12,12,12,0.96);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 1.35rem;
+    max-width: 460px;
+    width: 100%;
+}
+
+.auth-title {
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: clamp(1.7rem, 2.5vw, 2.25rem);
+}
+
+.animate-fade-in-down {
+    animation: fadeInDown 0.85s ease both;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.glow-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.glow-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.22), transparent 30%),
+                radial-gradient(circle at 80% 80%, rgba(220,53,69,0.24), transparent 32%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+
+.glow-btn:hover::before {
+    opacity: 1;
+}
+
+.btn-animated {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+.btn-animated:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(220,53,69,0.25);
+}
+
+.btn-animated:active {
+    transform: translateY(0);
+    box-shadow: 0 8px 18px rgba(220,53,69,0.18);
+}
+
+.input-group-text {
+    border-right: 0;
+    background: rgba(0,0,0,0.55);
+}
+
+.form-control {
+    border-left: 0;
+}
+
+.card {
+    overflow: hidden;
 }

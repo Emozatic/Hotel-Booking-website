@@ -176,7 +176,18 @@ app.post("/signup",wrapAsync(async(req,res)=>{
     }
 }))
 
-//
+//login route
+app.get("/login",(req,res)=>{
+    res.render("login.ejs");
+});
+
+//post login route
+app.post("/login",passport.authenticate("local",{
+    failureFlash:true,
+    failureRedirect:"/login"}),wrapAsync(async(req,res)=>{
+    req.flash("success","Welcome back!");
+    res.redirect("/home");
+}));
 
 
 //cusotm error handler

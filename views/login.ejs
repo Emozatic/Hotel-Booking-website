@@ -1,0 +1,32 @@
+<%- layout("/layouts/boilerplate.ejs") %>
+
+<div class="auth-wrapper d-flex align-items-center justify-content-center py-5">
+    <div class="auth-card card shadow-lg p-4 p-sm-5">
+        <div class="text-center mb-4 animate-fade-in-down">
+            <h1 class="auth-title mb-2">Welcome Back</h1>
+            <p class="text-muted mb-0">Secure login to continue.</p>
+        </div>
+        <form action="/login" method="POST" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <div class="input-group has-validation shadow-sm">
+                    <span class="input-group-text bg-dark text-danger"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
+                    <div class="invalid-feedback">Please enter your username.</div>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group has-validation shadow-sm">
+                    <span class="input-group-text bg-dark text-danger"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                    <div class="invalid-feedback">Please enter your password.</div>
+                </div>
+            </div>
+            <div class="d-grid gap-3">
+                <button type="submit" class="btn btn-primary btn-animated glow-btn py-3"><span>Login</span></button>
+                <a href="/signup" class="btn btn-outline-primary btn-animated py-2"><span>Create an account</span></a>
+            </div>
+        </form>
+    </div>
+</div>
