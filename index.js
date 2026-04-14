@@ -164,14 +164,20 @@ app.get("/signup",(req,res)=>{
     res.render("signup.ejs");
 })
 
-app.post("/signup",wrapAsync(async(req,res)=>{
+app.post("/signup",wrapAsync(async(req,res,next)=>{
     try{
         const {email,username}= req.body;
     const newUser= new User({email,username});
     const registeredUser= await User.register(newUser, req.body.password);
     console.log(registeredUser);
-    req.flash("success","Welcome to Booking App");
+    req.login(registeredUser,(err)=>{
+        if(err){
+            return next(err);
+        }
+        req.flash("success","Welcome to Booking App");
     res.redirect("/home");
+        });
+    
     }catch(err){
         req.flash("error",err.message);
         res.redirect("/signup");
