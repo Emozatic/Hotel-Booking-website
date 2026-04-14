@@ -58,10 +58,11 @@ passport.use(new LocalStretegy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-//middleware for flash
+//middleware for flash messages and store user info in res.locals
 app.use((req,res,next)=>{
     res.locals.successMsg= req.flash("success");
     res.locals.errorMsg= req.flash("error");
+    res.locals.currentUser= req.user;
     next();
 })
 
@@ -189,6 +190,17 @@ app.post("/login",passport.authenticate("local",{
     req.flash("success","Welcome back!");
     res.redirect("/home");
 }));
+
+//post logout rote
+app.post("/logout",(req,res)=>{
+    req.logout((err)=>{
+        if(err){
+            return next(err);
+        }
+        req.flash("success","Logged out successfully");
+        res.redirect("/home");
+    })
+})
 
 
 //cusotm error handler

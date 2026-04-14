@@ -11,9 +11,15 @@
         <a class="nav-link" href="/new">New Listing</a>
       </div>
       <div class="auth">
-        
+        <%if(!currentUser){%>
           <a href="/signup">Sign Up</a>
           <a href="/login">Login</a>
+        <%}%>
+        <%if(currentUser){%>
+          <form action="/logout" method="POST">
+            <button type="submit">Logout</button>
+          </form>
+        <%}%>
 
       </div>
     </div>
