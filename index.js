@@ -18,6 +18,7 @@ const flash= require("connect-flash");
 const LocalStretegy= require("passport-local");
 const passport= require("passport");
 const User= require("./models/user");
+const {isloggedIn}= require("./middleware");
 main()
 .then((res)=>{
     console.log("connected to database");
@@ -100,11 +101,11 @@ app.get("/home/:id",validateListing,wrapAsync(async(req,res)=>{
 }))
 
 //create route
-app.get("/new",(req,res)=>{
+app.get("/new",isloggedIn,(req,res)=>{
     res.render("new.ejs");
 })
 
-app.post("/home",validateListing,wrapAsync(async(req,res)=>{
+app.post("/home",isloggedIn,validateListing,wrapAsync(async(req,res)=>{
     const newListing= new Listing(req.body.listing);
     console.log(req.body.listing);
     await newListing.save().then((result)=>{console.log(result)}).catch((err)=>{console.log(err)}); 
@@ -114,28 +115,28 @@ app.post("/home",validateListing,wrapAsync(async(req,res)=>{
 
 
 //edit route
-app.get("/edit/:id",validateListing,wrapAsync(async(req,res)=>{
+app.get("/edit/:id",isloggedIn,validateListing,wrapAsync(async(req,res)=>{
     let{id}= req.params;
     let listing= await Listing.findById(id);
     res.render("edit.ejs",{id,listing});
 }));
 
 //post edit route
-app.put("/edit/:id",validateListing,wrapAsync(async(req,res)=>{   
+app.put("/edit/:id",isloggedIn,validateListing,wrapAsync(async(req,res)=>{   
     let {id}= req.params;
     let listing= await Listing.findByIdAndUpdate(id,{...req.body.listing});
     res.redirect("/home");
 }))
 
 //delete route
-app.delete("/delete/:id",wrapAsync(async(req,res)=>{
+app.delete("/delete/:id",isloggedIn,wrapAsync(async(req,res)=>{
     let {id}= req.params;
     await Listing.findByIdAndDelete(id);
     res.redirect("/home");
 }));
 
 //review route
-app.post("/home/:id/reviews",validateReview,wrapAsync(async(req,res)=>{
+app.post("/home/:id/reviews",isloggedIn,validateReview,wrapAsync(async(req,res)=>{
     let {id}=req.params;
     let listing= await Listing.findById(id);
     let newReview= new Review(req.body.review);
@@ -149,7 +150,7 @@ app.post("/home/:id/reviews",validateReview,wrapAsync(async(req,res)=>{
 
 
 //Delete review route
-app.delete("/home/:id/reviews/:reviewId",wrapAsync(async(req,res)=>{
+app.delete("/home/:id/reviews/:reviewId",isloggedIn,wrapAsync(async(req,res)=>{
     let {id, reviewId}= req.params; ///home/:listingId/reviews/:reviewId
     await Listing.findByIdAndUpdate(id,{$pull: {reviews: reviewId}});
     await Review.findByIdAndDelete(reviewId);
