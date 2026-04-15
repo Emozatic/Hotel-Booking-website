@@ -19,6 +19,7 @@ const LocalStretegy= require("passport-local");
 const passport= require("passport");
 const User= require("./models/user");
 const {isloggedIn}= require("./middleware");
+const {saveRedirectUrl}= require("./middleware");
 main()
 .then((res)=>{
     console.log("connected to database");
@@ -109,6 +110,7 @@ app.get("/new",isloggedIn,(req,res)=>{
 app.post("/home",isloggedIn,validateListing,wrapAsync(async(req,res)=>{
     const newListing= new Listing(req.body.listing);
     console.log(req.body.listing);
+    newListing.owner= req.user._id;
     await newListing.save().then((result)=>{console.log(result)}).catch((err)=>{console.log(err)}); 
     res.redirect("/home");
     req.flash("success","new Listing added");
@@ -190,11 +192,13 @@ app.get("/login",(req,res)=>{
 });
 
 //post login route
-app.post("/login",passport.authenticate("local",{
+app.post("/login",saveRedirectUrl,passport.authenticate("local",{
     failureFlash:true,
     failureRedirect:"/login"}),wrapAsync(async(req,res)=>{
     req.flash("success","Welcome back!");
-    res.redirect("/home");
+    console.log(res.locals.redirectUrl);
+    let redirectUrl= res.locals.redirectUrl || "/home ";
+    res.redirect(redirectUrl)
 }));
 
 //post logout rote

@@ -20,12 +20,14 @@
                         </div>
                     </div>
                     <div class="d-flex gap-2 justify-content-end mt-4">
+                        <%if(currentUser && currentUser._id.equals(listing.owner._id)){%>
                         <form action="/edit/<%= listing._id %>" method="GET" class="d-inline">
                             <button type="submit" class="btn btn-outline-primary btn-animated">Edit Listing</button>
                         </form>
                         <form action="/delete/<%= listing._id %>?_method=DELETE" method="POST" class="d-inline">
                             <button type="submit" class="btn btn-danger btn-animated" onclick="return confirm('Are you sure you want to delete this listing?')">Delete</button>
                         </form>
+                        <%}%>
                     </div>
                 </div>
             </div>
