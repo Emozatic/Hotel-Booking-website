@@ -20,6 +20,7 @@ const passport= require("passport");
 const User= require("./models/user");
 const {isloggedIn}= require("./middleware");
 const {saveRedirectUrl}= require("./middleware");
+const {isOwner}= require("./middleware");
 main()
 .then((res)=>{
     console.log("connected to database");
@@ -125,14 +126,14 @@ app.get("/edit/:id",isloggedIn,validateListing,wrapAsync(async(req,res)=>{
 }));
 
 //post edit route
-app.put("/edit/:id",isloggedIn,validateListing,wrapAsync(async(req,res)=>{   
+app.put("/edit/:id",isloggedIn,isOwner,validateListing,wrapAsync(async(req,res)=>{   
     let {id}= req.params;
     let listing= await Listing.findByIdAndUpdate(id,{...req.body.listing});
     res.redirect("/home");
 }))
 
 //delete route
-app.delete("/delete/:id",isloggedIn,wrapAsync(async(req,res)=>{
+app.delete("/delete/:id",isloggedIn,isOwner,wrapAsync(async(req,res)=>{
     let {id}= req.params;
     await Listing.findByIdAndDelete(id);
     res.redirect("/home");
