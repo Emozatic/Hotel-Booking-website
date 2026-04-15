@@ -75,6 +75,7 @@
                     <div class="card mb-3 review-item">
                         <div class="card-body">
                             <div class="review-header mb-2">
+                                <p><%= review.author.username %></p>
                                 <div class="review-stars" aria-label="Rating: <%= review.rating %> out of 5">
                                     <%= '★'.repeat(review.rating) %><%= '☆'.repeat(5 - review.rating) %>
                                 </div>

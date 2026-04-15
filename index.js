@@ -21,6 +21,10 @@ const User= require("./models/user");
 const {isloggedIn}= require("./middleware");
 const {saveRedirectUrl}= require("./middleware");
 const {isOwner}= require("./middleware");
+
+
+//mongoose.set("strictQuery", true);
+mongoose.set("strictPopulate", false);
 main()
 .then((res)=>{
     console.log("connected to database");
@@ -91,14 +95,16 @@ const validateReview= (req,res,next)=>{
 //index route
 app.get("/home",validateListing,wrapAsync(async(req,res)=>{
     const listings= await Listing.find({});
-    console.log(listings);
+    //console.log(listings);
     res.render("home.ejs",{listings});
 }))
 
 //show route
 app.get("/home/:id",validateListing,wrapAsync(async(req,res)=>{
     let {id}= req.params;
-    let listing= await Listing.findById(id).populate("reviews");
+    let listing= await Listing.findById(id).populate({path:"reviews",populate:{path:"author"}})
+    let reviews= await Review.find().populate("author");
+    console.log(reviews);
     console.log(listing);
     res.render("show.ejs",{listing});
 }))
@@ -144,6 +150,7 @@ app.post("/home/:id/reviews",isloggedIn,validateReview,wrapAsync(async(req,res)=
     let {id}=req.params;
     let listing= await Listing.findById(id);
     let newReview= new Review(req.body.review);
+    newReview.author= req.user._id;
     console.log(newReview);
     listing.reviews.push(newReview);
     await newReview.save();
