@@ -22,7 +22,8 @@ const {isloggedIn}= require("./middleware");
 const {saveRedirectUrl}= require("./middleware");
 const {isOwner}= require("./middleware");
 const{isReviewOwner}= require("./middleware");
-
+const listingController= require("./controller/listing");
+const reviewController= require("./controller/review");
 
 //mongoose.set("strictQuery", true);
 mongoose.set("strictPopulate", false);
@@ -95,80 +96,32 @@ const validateReview= (req,res,next)=>{
 
 
 //index route
-app.get("/home",validateListing,wrapAsync(async(req,res)=>{
-    const listings= await Listing.find({});
-    //console.log(listings);
-    res.render("home.ejs",{listings});
-}))
+app.get("/home",validateListing,wrapAsync(listingController.home));
 
 //show route
-app.get("/show/:id",validateListing,wrapAsync(async(req,res)=>{
-    let {id}= req.params;
-    let listing= await Listing.findById(id).populate({path:"reviews",populate:{path:"author"}})
-    let reviews= await Review.find().populate("author");
-    console.log(reviews);
-    console.log(listing);
-    res.render("show.ejs",{listing});
-}))
+app.get("/show/:id",validateListing,wrapAsync(listingController.show));
 
 //create route
-app.get("/new",isloggedIn,(req,res)=>{
-    res.render("new.ejs");
-})
+app.get("/new",isloggedIn,listingController.renderNewForm);
 
-app.post("/home",isloggedIn,validateListing,wrapAsync(async(req,res)=>{
-    const newListing= new Listing(req.body.listing);
-    console.log(req.body.listing);
-    newListing.owner= req.user._id;
-    await newListing.save().then((result)=>{console.log(result)}).catch((err)=>{console.log(err)}); 
-    res.redirect("/home");
-    req.flash("success","new Listing added");
-}))
+app.post("/home",isloggedIn,validateListing,wrapAsync(listingController.createNewListing));
 
 
 //edit route
-app.get("/edit/:id",isloggedIn,validateListing,wrapAsync(async(req,res)=>{
-    let{id}= req.params;
-    let listing= await Listing.findById(id);
-    res.render("edit.ejs",{id,listing});
-}));
+app.get("/edit/:id",isloggedIn,validateListing,wrapAsync(listingController.renderEditForm));
 
 //post edit route
-app.put("/edit/:id",isloggedIn,isOwner,validateListing,wrapAsync(async(req,res)=>{   
-    let {id}= req.params;
-    let listing= await Listing.findByIdAndUpdate(id,{...req.body.listing});
-    res.redirect("/home");
-}))
+app.put("/edit/:id",isloggedIn,isOwner,validateListing,wrapAsync(listingController.editListing));
 
 //delete route
-app.delete("/delete/:id",isloggedIn,isOwner,wrapAsync(async(req,res)=>{
-    let {id}= req.params;
-    await Listing.findByIdAndDelete(id);
-    res.redirect("/home");
-}));
+app.delete("/delete/:id",isloggedIn,isOwner,wrapAsync(listingController.deleteListing));
 
 //review route
-app.post("/home/:id/reviews",isloggedIn,validateReview,wrapAsync(async(req,res)=>{
-    let {id}=req.params;
-    let listing= await Listing.findById(id);
-    let newReview= new Review(req.body.review);
-    newReview.author= req.user._id;
-    console.log(newReview);
-    listing.reviews.push(newReview);
-    await newReview.save();
-    await listing.save();
-    
-    res.redirect(`/show/${id}`);
-}))
+app.post("/home/:id/reviews",isloggedIn,validateReview,wrapAsync(reviewController.createReview));
 
 
 //Delete review route
-app.delete("/home/:id/reviews/:reviewId",isloggedIn,isReviewOwner,wrapAsync(async(req,res)=>{
-    let {id, reviewId}= req.params; ///home/:listingId/reviews/:reviewId
-    await Listing.findByIdAndUpdate(id,{$pull: {reviews: reviewId}});
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/show/${id}`);
-}));
+app.delete("/home/:id/reviews/:reviewId",isloggedIn,isReviewOwner,wrapAsync(reviewController.deleteReview));
 
 
 //signup route
