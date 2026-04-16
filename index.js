@@ -21,10 +21,12 @@ const User= require("./models/user");
 const {isloggedIn}= require("./middleware");
 const {saveRedirectUrl}= require("./middleware");
 const {isOwner}= require("./middleware");
+const{isReviewOwner}= require("./middleware");
 
 
 //mongoose.set("strictQuery", true);
 mongoose.set("strictPopulate", false);
+const dbUrl = process.env.NODE_ENV === "test" ? "mongodb://localhost:27017/booking2_test" : "mongodb://localhost:27017/booking2";
 main()
 .then((res)=>{
     console.log("connected to database");
@@ -32,7 +34,7 @@ main()
     console.log(err);
 })
 async function main(){
-    await mongoose.connect("mongodb://localhost:27017/booking2");
+    await mongoose.connect(dbUrl);
 }
 
 
@@ -100,7 +102,7 @@ app.get("/home",validateListing,wrapAsync(async(req,res)=>{
 }))
 
 //show route
-app.get("/home/:id",validateListing,wrapAsync(async(req,res)=>{
+app.get("/show/:id",validateListing,wrapAsync(async(req,res)=>{
     let {id}= req.params;
     let listing= await Listing.findById(id).populate({path:"reviews",populate:{path:"author"}})
     let reviews= await Review.find().populate("author");
@@ -156,16 +158,16 @@ app.post("/home/:id/reviews",isloggedIn,validateReview,wrapAsync(async(req,res)=
     await newReview.save();
     await listing.save();
     
-    res.redirect(`/home/${id}`);
+    res.redirect(`/show/${id}`);
 }))
 
 
 //Delete review route
-app.delete("/home/:id/reviews/:reviewId",isloggedIn,wrapAsync(async(req,res)=>{
+app.delete("/home/:id/reviews/:reviewId",isloggedIn,isReviewOwner,wrapAsync(async(req,res)=>{
     let {id, reviewId}= req.params; ///home/:listingId/reviews/:reviewId
     await Listing.findByIdAndUpdate(id,{$pull: {reviews: reviewId}});
     await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/home/${id}`);
+    res.redirect(`/show/${id}`);
 }));
 
 
@@ -205,7 +207,7 @@ app.post("/login",saveRedirectUrl,passport.authenticate("local",{
     failureRedirect:"/login"}),wrapAsync(async(req,res)=>{
     req.flash("success","Welcome back!");
     console.log(res.locals.redirectUrl);
-    let redirectUrl= res.locals.redirectUrl || "/home ";
+    let redirectUrl= res.locals.redirectUrl || "/home";
     res.redirect(redirectUrl)
 }));
 
@@ -222,9 +224,9 @@ app.post("/logout",(req,res)=>{
 
 
 //cusotm error handler
-app.use((req,res,next)=>{
-    next(new ExpressError("Page Not Found",404));
-})
+// app.use((req,res,next)=>{
+//     next(new ExpressError("Page Not Found",404));
+// })
 
 
 //error handling middleware
@@ -233,13 +235,16 @@ app.use((err,req,res,next)=>{
     console.log(err);
     let{status=500,message="An error occurred"}= err;
     console.log(`Status: ${status}, Message: ${message}`);
-    res.render("error.ejs",{err});
+    res.status(status).render("error.ejs",{err});
 
 })
 
 
 
 
-app.listen(8000,()=>{
-    console.log("server is running on port 8000");
-})
+if (require.main === module) {
+    app.listen(8000,()=>{
+        console.log("server is running on port 8000");
+    });
+}
+module.exports = app;

@@ -13,7 +13,7 @@
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title"><%= listing.title %></h5>
                         <p class="card-text"><%= listing.price %>/night</p>
-                        <form action="/home/<%= listing._id %>" method="GET" class="mt-auto">
+                        <form action="/show/<%= listing._id %>" method="GET" class="mt-auto">
                             <button type="submit" class="btn btn-outline-primary">See details</button>
                         </form>
                     </div>
