@@ -7,7 +7,7 @@
                     <h1 class="h3 mb-0">Create New Listing</h1>
                 </div>
                 <div class="card-body">
-                    <form action="/home" method="POST" class="needs-validation" novalidate>
+                    <form action="/home" method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="title" class="form-label">Listing Title</label>
                             <input type="text" class="form-control" id="title" placeholder="Enter your listing title" name="listing[title]" 
@@ -23,7 +23,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="image" class="form-label">Image URL</label>
-                            <input type="url" class="form-control" id="image" placeholder="Enter your listing image link" name="listing[image]" required>
+                            <input type="file" class="form-control" id="image" placeholder="Enter your listing image link" name="listing[image]" required >
                             <div class="invalid-feedback">Add a valid URL for image</div>
                             <div class="valid-feedback">Looks Good</div>
                         </div>

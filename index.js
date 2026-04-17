@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express= require("express");
 const app= express();
 const mongoose= require("mongoose");
@@ -24,6 +25,11 @@ const {isOwner}= require("./middleware");
 const{isReviewOwner}= require("./middleware");
 const listingController= require("./controller/listing");
 const reviewController= require("./controller/review");
+const multer= require("multer");
+//const upload= multer({dest:"uploads/"});
+const {storage}= require("./cloudConfig");
+const upload= multer({storage});
+
 
 //mongoose.set("strictQuery", true);
 mongoose.set("strictPopulate", false);
@@ -104,7 +110,7 @@ app.get("/show/:id",validateListing,wrapAsync(listingController.show));
 //create route
 app.get("/new",isloggedIn,listingController.renderNewForm);
 
-app.post("/home",isloggedIn,validateListing,wrapAsync(listingController.createNewListing));
+app.post("/home",isloggedIn,validateListing,upload.single("listing[image]"),wrapAsync(listingController.createNewListing));
 
 
 //edit route
